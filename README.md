@@ -23,7 +23,7 @@ If you don't want to read much text, do the following steps:
 
 ```shell
 # fire up kind
-kind create cluster --image kindest/node:v1.32.0 --wait 5m --name crossplane-argocd
+kind create cluster --image kindest/node:v1.33.1 --wait 5m --name crossplane-argocd
 
 # Install ArgoCD
 kubectl apply -k argocd/install
@@ -37,6 +37,8 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 # be sure to have exported the env var locally, e.g. via
 # export DOPPLER_SERVICE_TOKEN="dp.st.dev.dopplerservicetoken"
 kubectl create secret generic doppler-token-auth-api --from-literal dopplerToken="$DOPPLER_SERVICE_TOKEN"
+
+kubectl create secret generic aws-creds -n crossplane-system --from-file=creds=./aws-creds.conf
 
 # Prepare Secret with ArgoCD API Token for Crossplane ArgoCD Provider (port forward can be run in subshell appending ' &' + Ctrl-C and beeing deleted after running create-argocd-api-token-secret.sh via 'fg 1%' + Ctrl-C)
 kubectl port-forward -n argocd --address='0.0.0.0' service/argocd-server 8443:443
@@ -2148,6 +2150,38 @@ Finally a full cycle is possible - from full bootstrap of ArgoCD & Crossplane Ma
 
 
 
+# Misc
+
+### Renovate issued builds keep failing
+
+Lately I registered a problem with the Renovate builds, that led to the following error:
+
+```shell
+--- Wait for crossplane to become ready (now prefaced with until as described in https://stackoverflow.com/questions/68226288/kubectl-wait-not-working-for-creation-of-resources)
+pod/crossplane-8676c674b6-zsrns condition met
+--- Wait until AWS Provider is up and running (now prefaced with until to prevent Error from server (NotFound): providers.pkg.crossplane.io 'upbound-provider-aws-s3' not found)
+error: timed out waiting for the condition on providers/upbound-provider-aws-s3
+Error: Process completed with exit code 1.
+``` 
+
+This indicated, that the `upbound-provider-aws-s3` didn't came up anymore.
+
+I tried to reconstruct the error locally and found, that all providers couldn't be installed anymore, showing an error that the providers couldn't be downloaded (HTTP 403). Then I remembered this https://blog.upbound.io/upbound-official-packages-changes:
+
+> Community members and users of the free Individual tier on Upbound can access only the latest version of a given official package.
+
+So using an older version than the newest will exactly lead to this error, if you don't have a enterprise subscription with Upbound.
+
+For an architecture like this repo's here this means (at least, as I oversee it right now), that we need to tell renovate to always update every package in one big PR - since every build with "old" provider versions will fail otherwise.
+
+Therefore I configured Renovate to group all dependency updates together [as described in the docs](https://docs.renovatebot.com/presets-group/#groupall):
+
+```json
+ "extends": [
+    "config:base",
+    "group:all"
+  ],
+```
 
 
 # Links
