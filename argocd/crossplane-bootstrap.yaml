@@ -12,7 +12,38 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/jonashackt/crossplane-argocd
+    repoURL: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      /crossplane-argocd
     targetRevision: HEAD
     path: argocd/crossplane-bootstrap
   destination:

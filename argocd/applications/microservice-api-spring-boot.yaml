@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/jonashackt/microservice-api-spring-boot-config
+    repoURL: https://github.com/tribu/microservice-api-spring-boot-config
     targetRevision: HEAD
     path: deployment
   destination:
