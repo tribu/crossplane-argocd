@@ -6,7 +6,7 @@ metadata:
   name: crossplane-provider-argocd-config
   namespace: argocd
   labels:
-    crossplane.jonashackt.io: crossplane
+    crossplane.onequince.com: crossplane
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:

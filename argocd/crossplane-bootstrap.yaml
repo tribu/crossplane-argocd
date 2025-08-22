@@ -6,15 +6,15 @@ metadata:
   name: crossplane-bootstrap
   namespace: argocd
   labels:
-    crossplane.jonashackt.io: bootstrap
+    crossplane.onequince.com: bootstrap
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: crossplane
   source:
-    repoURL: https://github.com/tribu/crossplane-argocd
+    repoURL: https://bitbucket.org/lastbrand/helm-templates
     targetRevision: HEAD
-    path: argocd/crossplane-bootstrap
+    path: mgmt-crossplane-bootstrap/apps
   destination:
     server: https://kubernetes.default.svc
     namespace: crossplane-system
